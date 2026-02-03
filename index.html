@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate Pro – Light Theme</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --bg:#f4f6fb; --panel:#ffffff; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+  --accent:#22c55e; --danger:#ef4444; --warning:#f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif;}
+body{background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+.hidden{display:none;}
+input,select{padding:.5rem;margin:.3rem 0;background:#ffffff;border:1px solid #d1d5db;color:var(--text);}
+button{padding:.5rem .8rem;border:none;cursor:pointer;}
+button.action{background:var(--accent);color:#ffffff;}
+button.danger{background:var(--danger);color:#fff;}
+.card{background:var(--card);padding:1rem;border-radius:8px;margin-bottom:1rem;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:.5rem;border-bottom:1px solid #e5e7eb;text-align:left;}
+th{color:var(--muted);}
+aside{width:260px;background:var(--panel);padding:1rem;transition:.3s;}
+aside h2{margin-bottom:1rem;}
+aside button{width:100%;margin-bottom:.5rem;text-align:left;color:var(--text);background:var(--card);}
+aside button.active{background:var(--accent);color:#ffffff;display:flex;justify-content:space-between;align-items:center;}
+main{flex:1;padding:1rem;overflow-y:auto;}
+.hamburger{display:none;font-size:1.5rem;cursor:pointer;margin-bottom:1rem;}
+@media(max-width:768px){aside{position:fixed;height:100%;transform:translateX(-100%);z-index:1000;}
+aside.open{transform:translateX(0);}
+.hamburger{display:block;}
+.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:900;}
+.overlay.show{display:block;}
+}
+.login{margin:auto;background:var(--card);padding:2rem;border-radius:12px;width:90%;max-width:400px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+.login input{width:80%;margin:0.5rem 0;}
+.login button{width:50%;margin-top:1rem;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginBox" class="login">
+  <h2>Real Estate Pro Login</h2>
+  <input id="username" placeholder="Username"><br>
+  <input id="password" type="password" placeholder="Password"><br>
+  <button id="loginBtn">Login</button>
+  <p id="loginMsg"></p>
+</div>
+
+<!-- APP -->
+<aside id="sidebar" class="hidden">
+  <h2>🏠 Real Estate Pro</h2>
+  <button data-view="dashboard" class="active">Dashboard</button>
+  <button data-view="properties">Properties</button>
+  <button data-view="sales">Sales</button>
+  <button data-view="activity">Activity Log</button>
+  <button id="backupBtn">Backup</button>
+  <button id="restoreBtn">Restore</button>
+</aside>
+
+<div class="overlay" id="overlay"></div>
+
+<main id="mainApp" class="hidden">
+  <span class="hamburger" id="hamburger">☰</span>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="view">
+    <div class="card">
+      <h3>Overview</h3>
+      <p>Total Properties: <span id="statProperties">0</span></p>
+      <p>Total Sales: <span id="statSales">0</span></p>
+    </div>
+    <canvas id="salesChart"></canvas>
+  </section>
+
+  <!-- PROPERTIES -->
+  <section id="properties" class="view hidden">
+    <div class="card">
+      <h3>Add Property</h3>
+      <input id="propName" placeholder="Property Name">
+      <input id="propQty" type="number" placeholder="Units Available">
+      <input id="propPrice" type="number" placeholder="Price per Unit">
+      <button class="action" id="addProp">Add</button>
+    </div>
+    <div class="card">
+      <h3>Property Inventory</h3>
+      <table>
+        <thead><tr><th>Name</th><th>Qty</th><th>Price</th><th></th></tr></thead>
+        <tbody id="propertyTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SALES -->
+  <section id="sales" class="view hidden">
+    <div class="card">
+      <h3>Cart</h3>
+      <select id="saleSelect"></select>
+      <input id="saleQty" type="number" value="1">
+      <button class="action" id="addToCart">Add</button>
+      <table>
+        <thead><tr><th>Property</th><th>Qty</th></tr></thead>
+        <tbody id="cartTable"></tbody>
+      </table>
+      <button class="action" id="checkout">Checkout</button>
+    </div>
+  </section>
+
+  <!-- ACTIVITY -->
+  <section id="activity" class="view hidden">
+    <div class="card">
+      <h3>Activity Log</h3>
+      <ul id="activityList"></ul>
+    </div>
+  </section>
+</main>
+
+<script>
+// LOGIN
+const loginBox=document.getElementById('loginBox'), mainApp=document.getElementById('mainApp'),
+sidebar=document.getElementById('sidebar'), loginMsg=document.getElementById('loginMsg');
+document.getElementById('loginBtn').onclick = ()=>{
+  const user=document.getElementById('username').value.trim();
+  const pass=document.getElementById('password').value.trim();
+  if(user==='admin' && pass==='admin'){
+    loginBox.classList.add('hidden'); sidebar.classList.remove('hidden'); mainApp.classList.remove('hidden');
+    initApp();
+  } else loginMsg.textContent="Invalid credentials! Use admin/admin";
+};
+
+// STATE
+const state={properties:JSON.parse(localStorage.getItem('properties')||'[]'),
+salesLog:JSON.parse(localStorage.getItem('salesLog')||'[]'),
+activity:JSON.parse(localStorage.getItem('activity')||'[]'),
+cart:[],undoStack:[],redoStack:[]};
+
+function save(){localStorage.setItem('properties',JSON.stringify(state.properties));
+localStorage.setItem('salesLog',JSON.stringify(state.salesLog));
+localStorage.setItem('activity',JSON.stringify(state.activity));}
+
+// APP INIT
+function initApp(){
+  setupNav();
+  renderProperties();
+  renderCart();
+  renderActivity();
+  renderSalesChart();
+  updateDashboard();
+}
+
+// NAVIGATION
+const hamburger=document.getElementById('hamburger'), overlay=document.getElementById('overlay');
+hamburger.onclick=()=>{sidebar.classList.toggle('open'); overlay.classList.toggle('show');};
+overlay.onclick=()=>{sidebar.classList.remove('open'); overlay.classList.remove('show');};
+
+function setupNav(){
+  document.querySelectorAll('aside button[data-view]').forEach(btn=>{
+    btn.onclick=()=>{
+      document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+      document.getElementById(btn.dataset.view).classList.remove('hidden');
+      document.querySelectorAll('aside button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      sidebar.classList.remove('open'); overlay.classList.remove('show');
+    };
+  });
+}
+
+// PROPERTIES
+const propertyTable=document.getElementById('propertyTable');
+function saveState(){state.undoStack.push(JSON.stringify({properties:state.properties,salesLog:state.salesLog})); if(state.undoStack.length>20) state.undoStack.shift(); state.redoStack=[];}
+function renderProperties(){
+  propertyTable.innerHTML='';
+  state.properties.forEach((p,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${p.name}</td><td>${p.qty}</td><td>${p.price}</td><td><button class="danger" onclick="deleteProp(${i})">X</button></td>`;
+    propertyTable.appendChild(tr);
+  });
+  renderSalesSelect(); updateDashboard();
+}
+function deleteProp(i){saveState(); log(`Deleted property: ${state.properties[i].name}`); state.properties.splice(i,1); save(); renderProperties();}
+document.getElementById('addProp').onclick=()=>{
+  const name=propName.value.trim(), qty=+propQty.value, price=+propPrice.value;
+  if(!name||qty<=0||price<=0) return alert('Invalid input');
+  saveState();
+  state.properties.push({name,qty,price}); log(`Added property: ${name}`); save(); renderProperties();
+};
+
+// SALES
+const saleSelect=document.getElementById('saleSelect'), cartTable=document.getElementById('cartTable');
+function renderSalesSelect(){
+  saleSelect.innerHTML='';
+  state.properties.forEach((p,i)=>{if(p.qty>0){const o=document.createElement('option');o.value=i;o.textContent=p.name;saleSelect.appendChild(o);}});
+}
+function renderCart(){cartTable.innerHTML='';state.cart.forEach(c=>{const tr=document.createElement('tr'); tr.innerHTML=`<td>${c.name}</td><td>${c.qty}</td>`; cartTable.appendChild(tr);});}
+document.getElementById('addToCart').onclick=()=>{
+  const idx=+saleSelect.value, qty=+saleQty.value, prop=state.properties[idx];
+  if(!prop||qty<=0||qty>prop.qty) return alert('Invalid quantity');
+  state.cart.push({name:prop.name,qty}); renderCart();
+};
+document.getElementById('checkout').onclick=()=>{
+  if(!state.cart.length) return alert('Cart empty');
+  saveState();
+  state.cart.forEach(c=>{ const prop=state.properties.find(p=>p.name===c.name); prop.qty-=c.qty; });
+  state.salesLog.push({id:crypto.randomUUID(), items:[...state.cart], time:new Date().toLocaleString()});
+  log('Checkout completed');
+  state.cart=[]; save(); renderProperties(); renderCart(); renderSalesChart();
+};
+
+// DASHBOARD
+const statProperties=document.getElementById('statProperties'), statSales=document.getElementById('statSales');
+const ctx=document.getElementById('salesChart').getContext('2d');
+let salesChart=new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Units Sold',data:[],backgroundColor:'#22c55e'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}});
+function renderSalesChart(){
+  const labels=state.salesLog.map((s,i)=>`Sale ${i+1}`);
+  const data=state.salesLog.map(s=>s.items.reduce((a,b)=>a+b.qty,0));
+  salesChart.data.labels=labels; salesChart.data.datasets[0].data=data; salesChart.update();
+}
+function updateDashboard(){statProperties.textContent=state.properties.length; statSales.textContent=state.salesLog.length;}
+
+// ACTIVITY
+function log(msg){state.activity.unshift({msg,time:new Date().toLocaleString()}); if(state.activity.length>100) state.activity.pop(); save(); renderActivity();}
+function renderActivity(){const activityList=document.getElementById('activityList'); activityList.innerHTML='';state.activity.forEach(a=>{const li=document.createElement('li'); li.textContent=`${a.time} — ${a.msg}`; activityList.appendChild(li);});}
+
+// BACKUP/RESTORE
+document.getElementById('backupBtn').onclick=()=>{
+  const blob=new Blob([JSON.stringify(state)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='realestate-backup.json'; a.click(); log('Backup exported');
+};
+document.getElementById('restoreBtn').onclick=()=>{
+  const input=document.createElement('input'); input.type='file'; input.accept='application/json';
+  input.onchange=(e)=>{const file=e.target.files[0]; const reader=new FileReader(); reader.onload=()=>{
+    const restored=JSON.parse(reader.result);
+    state.properties=restored.properties||[]; state.salesLog=restored.salesLog||[]; state.activity=restored.activity||[];
+    save(); renderProperties(); renderSalesChart(); renderActivity(); log('Backup restored');
+  }; reader.readAsText(file);}; input.click();
+};
+</script>
+</body>
+</html>
