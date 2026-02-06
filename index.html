@@ -3,240 +3,296 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Real Estate Pro – Light Theme</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>Estate Portfolio</title>
+
 <style>
-:root {
-  --bg:#f4f6fb; --panel:#ffffff; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
-  --accent:#22c55e; --danger:#ef4444; --warning:#f59e0b;
+/* ================= RESET ================= */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: Arial, sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif;}
-body{background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
-.hidden{display:none;}
-input,select{padding:.5rem;margin:.3rem 0;background:#ffffff;border:1px solid #d1d5db;color:var(--text);}
-button{padding:.5rem .8rem;border:none;cursor:pointer;}
-button.action{background:var(--accent);color:#ffffff;}
-button.danger{background:var(--danger);color:#fff;}
-.card{background:var(--card);padding:1rem;border-radius:8px;margin-bottom:1rem;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
-table{width:100%;border-collapse:collapse;}
-th,td{padding:.5rem;border-bottom:1px solid #e5e7eb;text-align:left;}
-th{color:var(--muted);}
-aside{width:260px;background:var(--panel);padding:1rem;transition:.3s;}
-aside h2{margin-bottom:1rem;}
-aside button{width:100%;margin-bottom:.5rem;text-align:left;color:var(--text);background:var(--card);}
-aside button.active{background:var(--accent);color:#ffffff;display:flex;justify-content:space-between;align-items:center;}
-main{flex:1;padding:1rem;overflow-y:auto;}
-.hamburger{display:none;font-size:1.5rem;cursor:pointer;margin-bottom:1rem;}
-@media(max-width:768px){aside{position:fixed;height:100%;transform:translateX(-100%);z-index:1000;}
-aside.open{transform:translateX(0);}
-.hamburger{display:block;}
-.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:900;}
-.overlay.show{display:block;}
+
+body{
+  background:#f5f5f5;
+  line-height:1.6;
+  color:#333;
 }
-.login{margin:auto;background:var(--card);padding:2rem;border-radius:12px;width:90%;max-width:400px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-.login input{width:80%;margin:0.5rem 0;}
-.login button{width:50%;margin-top:1rem;}
+
+/* ================= HEADER ================= */
+header{
+  background:#d71a28;
+  color:#fff;
+  padding:15px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+header h1{
+  font-size:24px;
+}
+
+nav a{
+  color:white;
+  margin:0 10px;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+nav a:hover{
+  text-decoration:underline;
+}
+
+/* ================= HERO ================= */
+.hero{
+  background:white;
+  padding:70px 20px;
+  text-align:center;
+}
+
+.hero h2{
+  font-size:30px;
+  margin-bottom:20px;
+}
+
+.hero input{
+  width:70%;
+  max-width:500px;
+  padding:12px;
+  font-size:16px;
+  border-radius:5px;
+  border:1px solid #ccc;
+}
+
+.hero button{
+  padding:12px 20px;
+  border:none;
+  border-radius:5px;
+  background:#d71a28;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* ================= SECTIONS ================= */
+section{
+  padding:50px 20px;
+}
+
+.section-title{
+  text-align:center;
+  font-size:26px;
+  margin-bottom:30px;
+}
+
+/* ================= GRID ================= */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+
+/* ================= CARD ================= */
+.card{
+  background:white;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  transition:transform .3s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+.card img{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+}
+
+.card-content{
+  padding:15px;
+}
+
+.card-content h3{
+  margin-bottom:8px;
+}
+
+.card-content p{
+  font-size:14px;
+  color:#555;
+}
+
+/* ================= AGENTS ================= */
+.agent-img{
+  height:220px;
+}
+
+/* ================= FOOTER ================= */
+footer{
+  background:#d71a28;
+  color:white;
+  text-align:center;
+  padding:25px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media(max-width:768px){
+  header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  nav{
+    margin-top:10px;
+  }
+
+  .hero input{
+    width:100%;
+    margin-bottom:10px;
+  }
+}
 </style>
 </head>
+
 <body>
 
-<!-- LOGIN -->
-<div id="loginBox" class="login">
-  <h2>Real Estate Pro Login</h2>
-  <input id="username" placeholder="Username"><br>
-  <input id="password" type="password" placeholder="Password"><br>
-  <button id="loginBtn">Login</button>
-  <p id="loginMsg"></p>
-</div>
+<!-- ================= HEADER ================= -->
+<header>
+  <h1>Estate Portfolio</h1>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#properties">Properties</a>
+    <a href="#agents">Agents</a>
+    <a href="#news">News</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
 
-<!-- APP -->
-<aside id="sidebar" class="hidden">
-  <h2>🏠 Real Estate Pro</h2>
-  <button data-view="dashboard" class="active">Dashboard</button>
-  <button data-view="properties">Properties</button>
-  <button data-view="sales">Sales</button>
-  <button data-view="activity">Activity Log</button>
-  <button id="backupBtn">Backup</button>
-  <button id="restoreBtn">Restore</button>
-</aside>
+<!-- ================= HERO ================= -->
+<section class="hero" id="home">
+  <h2>Find Your Dream Property in Canada</h2>
+  <input type="text" id="searchInput" placeholder="Search by city or property type">
+  <button onclick="searchProperty()">Search</button>
+  <p id="resultText" style="margin-top:10px;color:#d71a28;"></p>
+</section>
 
-<div class="overlay" id="overlay"></div>
+<!-- ================= PROPERTIES ================= -->
+<section id="properties">
+  <h2 class="section-title">Featured Properties</h2>
 
-<main id="mainApp" class="hidden">
-  <span class="hamburger" id="hamburger">☰</span>
+  <div class="grid">
 
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="view">
     <div class="card">
-      <h3>Overview</h3>
-      <p>Total Properties: <span id="statProperties">0</span></p>
-      <p>Total Sales: <span id="statSales">0</span></p>
+      <img src="images/property1.png">
+      <div class="card-content">
+        <h3>Modern Condo - Toronto</h3>
+        <p>$750,000 | 2 Beds | 2 Baths</p>
+      </div>
     </div>
-    <canvas id="salesChart"></canvas>
-  </section>
 
-  <!-- PROPERTIES -->
-  <section id="properties" class="view hidden">
     <div class="card">
-      <h3>Add Property</h3>
-      <input id="propName" placeholder="Property Name">
-      <input id="propQty" type="number" placeholder="Units Available">
-      <input id="propPrice" type="number" placeholder="Price per Unit">
-      <button class="action" id="addProp">Add</button>
+      <img src="images/property2.png">
+      <div class="card-content">
+        <h3>Luxury Home - Vancouver</h3>
+        <p>$1,200,000 | 4 Beds | 3 Baths</p>
+      </div>
     </div>
-    <div class="card">
-      <h3>Property Inventory</h3>
-      <table>
-        <thead><tr><th>Name</th><th>Qty</th><th>Price</th><th></th></tr></thead>
-        <tbody id="propertyTable"></tbody>
-      </table>
-    </div>
-  </section>
 
-  <!-- SALES -->
-  <section id="sales" class="view hidden">
     <div class="card">
-      <h3>Cart</h3>
-      <select id="saleSelect"></select>
-      <input id="saleQty" type="number" value="1">
-      <button class="action" id="addToCart">Add</button>
-      <table>
-        <thead><tr><th>Property</th><th>Qty</th></tr></thead>
-        <tbody id="cartTable"></tbody>
-      </table>
-      <button class="action" id="checkout">Checkout</button>
+      <img src="images/property3.png">
+      <div class="card-content">
+        <h3>Townhouse - Montreal</h3>
+        <p>$500,000 | 3 Beds | 2 Baths</p>
+      </div>
     </div>
-  </section>
 
-  <!-- ACTIVITY -->
-  <section id="activity" class="view hidden">
     <div class="card">
-      <h3>Activity Log</h3>
-      <ul id="activityList"></ul>
+      <img src="images/property4.png">
+      <div class="card-content">
+        <h3>Family Home - Calgary</h3>
+        <p>$650,000 | 3 Beds | 3 Baths</p>
+      </div>
     </div>
-  </section>
-</main>
 
+  </div>
+</section>
+
+<!-- ================= AGENTS ================= -->
+<section id="agents">
+  <h2 class="section-title">Meet Our Agents</h2>
+
+  <div class="grid">
+
+    <div class="card">
+      <img src="images/agent1.png" class="agent-img">
+      <div class="card-content">
+        <h3>Jane Smith</h3>
+        <p>Senior Agent</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="images/agent2.png" class="agent-img">
+      <div class="card-content">
+        <h3>John Doe</h3>
+        <p>Real Estate Specialist</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="images/agent3.png" class="agent-img">
+      <div class="card-content">
+        <h3>Mary Johnson</h3>
+        <p>Property Consultant</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= NEWS ================= -->
+<section id="news">
+  <h2 class="section-title">Latest Market News</h2>
+
+  <div class="grid">
+    <div class="card"><div class="card-content">Toronto housing prices continue rising in 2026.</div></div>
+    <div class="card"><div class="card-content">Vancouver condos attract international buyers.</div></div>
+    <div class="card"><div class="card-content">Suburban homes gaining popularity across Canada.</div></div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer id="contact">
+  <p>© 2026 Estate Portfolio | All Rights Reserved</p>
+</footer>
+
+<!-- ================= JAVASCRIPT ================= -->
 <script>
-// LOGIN
-const loginBox=document.getElementById('loginBox'), mainApp=document.getElementById('mainApp'),
-sidebar=document.getElementById('sidebar'), loginMsg=document.getElementById('loginMsg');
-document.getElementById('loginBtn').onclick = ()=>{
-  const user=document.getElementById('username').value.trim();
-  const pass=document.getElementById('password').value.trim();
-  if(user==='admin' && pass==='admin'){
-    loginBox.classList.add('hidden'); sidebar.classList.remove('hidden'); mainApp.classList.remove('hidden');
-    initApp();
-  } else loginMsg.textContent="Invalid credentials! Use admin/admin";
-};
+const properties = [
+  "Toronto Condo",
+  "Vancouver Luxury Home",
+  "Montreal Townhouse",
+  "Calgary Family Home"
+];
 
-// STATE
-const state={properties:JSON.parse(localStorage.getItem('properties')||'[]'),
-salesLog:JSON.parse(localStorage.getItem('salesLog')||'[]'),
-activity:JSON.parse(localStorage.getItem('activity')||'[]'),
-cart:[],undoStack:[],redoStack:[]};
+function searchProperty(){
+  const value = document.getElementById("searchInput").value.toLowerCase();
+  const results = properties.filter(p => p.toLowerCase().includes(value));
 
-function save(){localStorage.setItem('properties',JSON.stringify(state.properties));
-localStorage.setItem('salesLog',JSON.stringify(state.salesLog));
-localStorage.setItem('activity',JSON.stringify(state.activity));}
-
-// APP INIT
-function initApp(){
-  setupNav();
-  renderProperties();
-  renderCart();
-  renderActivity();
-  renderSalesChart();
-  updateDashboard();
+  if(value === ""){
+    resultText.innerHTML = "";
+  }else if(results.length > 0){
+    resultText.innerHTML = "Found: " + results.join(", ");
+  }else{
+    resultText.innerHTML = "No property found.";
+  }
 }
-
-// NAVIGATION
-const hamburger=document.getElementById('hamburger'), overlay=document.getElementById('overlay');
-hamburger.onclick=()=>{sidebar.classList.toggle('open'); overlay.classList.toggle('show');};
-overlay.onclick=()=>{sidebar.classList.remove('open'); overlay.classList.remove('show');};
-
-function setupNav(){
-  document.querySelectorAll('aside button[data-view]').forEach(btn=>{
-    btn.onclick=()=>{
-      document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
-      document.getElementById(btn.dataset.view).classList.remove('hidden');
-      document.querySelectorAll('aside button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      sidebar.classList.remove('open'); overlay.classList.remove('show');
-    };
-  });
-}
-
-// PROPERTIES
-const propertyTable=document.getElementById('propertyTable');
-function saveState(){state.undoStack.push(JSON.stringify({properties:state.properties,salesLog:state.salesLog})); if(state.undoStack.length>20) state.undoStack.shift(); state.redoStack=[];}
-function renderProperties(){
-  propertyTable.innerHTML='';
-  state.properties.forEach((p,i)=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${p.name}</td><td>${p.qty}</td><td>${p.price}</td><td><button class="danger" onclick="deleteProp(${i})">X</button></td>`;
-    propertyTable.appendChild(tr);
-  });
-  renderSalesSelect(); updateDashboard();
-}
-function deleteProp(i){saveState(); log(`Deleted property: ${state.properties[i].name}`); state.properties.splice(i,1); save(); renderProperties();}
-document.getElementById('addProp').onclick=()=>{
-  const name=propName.value.trim(), qty=+propQty.value, price=+propPrice.value;
-  if(!name||qty<=0||price<=0) return alert('Invalid input');
-  saveState();
-  state.properties.push({name,qty,price}); log(`Added property: ${name}`); save(); renderProperties();
-};
-
-// SALES
-const saleSelect=document.getElementById('saleSelect'), cartTable=document.getElementById('cartTable');
-function renderSalesSelect(){
-  saleSelect.innerHTML='';
-  state.properties.forEach((p,i)=>{if(p.qty>0){const o=document.createElement('option');o.value=i;o.textContent=p.name;saleSelect.appendChild(o);}});
-}
-function renderCart(){cartTable.innerHTML='';state.cart.forEach(c=>{const tr=document.createElement('tr'); tr.innerHTML=`<td>${c.name}</td><td>${c.qty}</td>`; cartTable.appendChild(tr);});}
-document.getElementById('addToCart').onclick=()=>{
-  const idx=+saleSelect.value, qty=+saleQty.value, prop=state.properties[idx];
-  if(!prop||qty<=0||qty>prop.qty) return alert('Invalid quantity');
-  state.cart.push({name:prop.name,qty}); renderCart();
-};
-document.getElementById('checkout').onclick=()=>{
-  if(!state.cart.length) return alert('Cart empty');
-  saveState();
-  state.cart.forEach(c=>{ const prop=state.properties.find(p=>p.name===c.name); prop.qty-=c.qty; });
-  state.salesLog.push({id:crypto.randomUUID(), items:[...state.cart], time:new Date().toLocaleString()});
-  log('Checkout completed');
-  state.cart=[]; save(); renderProperties(); renderCart(); renderSalesChart();
-};
-
-// DASHBOARD
-const statProperties=document.getElementById('statProperties'), statSales=document.getElementById('statSales');
-const ctx=document.getElementById('salesChart').getContext('2d');
-let salesChart=new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{label:'Units Sold',data:[],backgroundColor:'#22c55e'}]},options:{responsive:true,scales:{y:{beginAtZero:true}}}});
-function renderSalesChart(){
-  const labels=state.salesLog.map((s,i)=>`Sale ${i+1}`);
-  const data=state.salesLog.map(s=>s.items.reduce((a,b)=>a+b.qty,0));
-  salesChart.data.labels=labels; salesChart.data.datasets[0].data=data; salesChart.update();
-}
-function updateDashboard(){statProperties.textContent=state.properties.length; statSales.textContent=state.salesLog.length;}
-
-// ACTIVITY
-function log(msg){state.activity.unshift({msg,time:new Date().toLocaleString()}); if(state.activity.length>100) state.activity.pop(); save(); renderActivity();}
-function renderActivity(){const activityList=document.getElementById('activityList'); activityList.innerHTML='';state.activity.forEach(a=>{const li=document.createElement('li'); li.textContent=`${a.time} — ${a.msg}`; activityList.appendChild(li);});}
-
-// BACKUP/RESTORE
-document.getElementById('backupBtn').onclick=()=>{
-  const blob=new Blob([JSON.stringify(state)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='realestate-backup.json'; a.click(); log('Backup exported');
-};
-document.getElementById('restoreBtn').onclick=()=>{
-  const input=document.createElement('input'); input.type='file'; input.accept='application/json';
-  input.onchange=(e)=>{const file=e.target.files[0]; const reader=new FileReader(); reader.onload=()=>{
-    const restored=JSON.parse(reader.result);
-    state.properties=restored.properties||[]; state.salesLog=restored.salesLog||[]; state.activity=restored.activity||[];
-    save(); renderProperties(); renderSalesChart(); renderActivity(); log('Backup restored');
-  }; reader.readAsText(file);}; input.click();
-};
 </script>
+
 </body>
 </html>
